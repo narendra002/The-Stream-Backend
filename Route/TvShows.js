@@ -1,14 +1,14 @@
 const express=require("express");
 const router=express.Router();
-const Movie =require("../Models/Movie.js");
+const TvShow =require("../Models/TvShow.js");
 
 
 // Create Method
 router.post("/",async (req,res)=>{
-	const newMovie=new Movie (req.body);
+	const newTvShow=new TvShow (req.body);
 	try {
-		const savedMovie= await newMovie.save();
-		res.status(201).json(savedMovie);
+		const savedTvShow= await newTvShow.save();
+		res.status(201).json(savedTvShow);
 	} catch (error) {
 		res.status(500).json(error);
 	}
@@ -19,10 +19,10 @@ router.post("/",async (req,res)=>{
 router.put("/:id",async (req,res)=>{
 
 	try {
-		const UpdatedMovie= await Movie.findByIdAndUpdate(req.params.id,{$set	:req.body},{
+		const UpdatedTvShow= await TvShow.findByIdAndUpdate(req.params.id,{$set	:req.body},{
 			new:true
 		})  ;
-		res.status(200).json(UpdatedMovie);
+		res.status(200).json(UpdatedTvShow);
 	} catch (error) {
 		res.status(500).json(error);
 	}
@@ -34,7 +34,7 @@ router.put("/:id",async (req,res)=>{
 router.delete("/:id",async (req,res)=>{
 
 	try {
-await Movie.findByIdAndDelete(req.params.id);
+await TvShow.findByIdAndDelete(req.params.id);
 		res.status(200).json("The movie is Deleted");
 	} catch (error) {
 		res.status(500).json(error);
@@ -45,9 +45,9 @@ await Movie.findByIdAndDelete(req.params.id);
 router.get("/find/:id",async (req,res)=>{
 
 	try {
-		const movie=
-await Movie.findById(req.params.id);
-		res.status(200).json(movie);
+		const tvShow=
+await TvShow.findById(req.params.id);
+		res.status(200).json(tvShow);
 	} catch (error) {
 		res.status(500).json(error);
 	}
@@ -57,9 +57,9 @@ await Movie.findById(req.params.id);
 router.get("/",async (req,res)=>{
 
 	try {
-		const movie=
-await Movie.find();
-		res.status(200).json(movie);
+		const tvShow=
+await TvShow.find();
+		res.status(200).json(tvShow);
 	} catch (error) {
 		res.status(500).json(error);
 	}
@@ -68,22 +68,22 @@ await Movie.find();
 // Get Random Method
 router.get("/random",async (req,res)=>{
 const type=req.query.type;
-	let movie;
+	let tvShow;
 		
 	try {
 if(type=="series"){
-	movie=await Movie.aggregate([{
-		$match:{isSeries:true}},
+	tvShow=await TvShow.aggregate([{
+		$match:{isSeries:false}},
  {$sample:{size:1}},]);
 }
 else{
-movie=await Movie.aggregate([{
-$match:{isSeries:false}},
+    tvShow=await TvShow.aggregate([{
+$match:{isSeries:true}},
  {$sample:{size:1}},]);
 		}
 
 
-		res.status(200).json(movie);
+		res.status(200).json(TvShow);
 	} catch (error) {
 		res.status(500).json(error);
 	}
