@@ -6,7 +6,10 @@ const mongoose=require('mongoose');
 const mySecret = process.env.Mongo_url;
 	const movieRoute=require('./Route/Movies');
 const RowRoute=require('./Route/Rows');
-const tvShowRoute=require('./Route/TvShows')
+const tvShowRoute=require('./Route/TvShows');
+const AuthRoute=require('./Route/auth');
+const UserRoute=require('./Route/Users');
+
 mongoose.set('strictQuery', false);
 mongoose.connect(mySecret,								 
 { useNewUrlParser: true, useUnifiedTopology: true,
@@ -24,6 +27,9 @@ app.use(express.json());
 app.use("/movie",movieRoute);
 app.use("/list",RowRoute);
 app.use("/tvShow",tvShowRoute);
+app.use("/auth", AuthRoute);
+app.use("/auth", UserRoute);
+
 app.listen(4000, () => {
   console.log('Backend server is running');
 });
