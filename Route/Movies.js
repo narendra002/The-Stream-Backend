@@ -89,4 +89,14 @@ $match:{isSeries:false}},
 	}
 });
 
+router.post("/batch", async (req, res) => {
+	const movies = req.body;
+	try {
+	  const savedMovies = await Movie.insertMany(movies);
+	  res.status(201).json(savedMovies);
+	} catch (error) {
+	  res.status(500).json(error);
+	}
+  });
+  
 module.exports=router;
