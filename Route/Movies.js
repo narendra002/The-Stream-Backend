@@ -98,5 +98,20 @@ router.post("/batch", async (req, res) => {
 	  res.status(500).json(error);
 	}
   });
+  // Search Method
+router.get("/search", async (req, res) => {
+	const keyword = req.query.keyword;
+	try {
+	  const movies = await Movie.find({
+		$or: [
+		  { title: { $regex: keyword, $options: "i" } },
+		  { description: { $regex: keyword, $options: "i" } },
+		],
+	  });
+	  res.status(200).json(movies);
+	} catch (error) {
+	  res.status(500).json(error);
+	}
+  });
   
 module.exports=router;
