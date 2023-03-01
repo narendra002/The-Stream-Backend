@@ -2,7 +2,7 @@ const mongoose	=require('mongoose');
 const MovieSchema=new mongoose.Schema(
 	{
 	title:{type:String ,required:true,unique:true},
-	desc:{type:String},
+	overview:{type:String},
 	backdrop_path:{type:String},
 	poster_path:{type:String},
 	trailer:{type:String},
@@ -10,7 +10,7 @@ const MovieSchema=new mongoose.Schema(
 	first_air_date:{type:String},
 	limit:{type:String},
 	genre:{type:String},
-	isSeries:{type:Boolean,default:false},
+	
 	
 },
 {timeStamps:true});
