@@ -1,7 +1,9 @@
 const express=require("express");
 const router=express.Router();
 const Movie =require("../Models/Movie.js");
+const axios = require('axios');
 
+const API_KEY = '4008ea8497eda5d3e80f32017f7d35bc';
 
 // Create Method
 router.post("/",async (req,res)=>{
@@ -14,7 +16,83 @@ router.post("/",async (req,res)=>{
 	}
 	 
 });
+router.get('/:name', async (req, res) => {
+	const name = req.params.name;
+	try {
+	  const response = await axios.get(`https://api.themoviedb.org/3/search/movie?api_key=${API_KEY}&query=${name}`);
+	  const results = response.data.results;
+	  const movie = results[0];
+	  const { title, overview, backdrop_path, poster_path, release_date, genre_ids, id } = movie;
+	  const genreResponse = await axios.get(`https://api.themoviedb.org/3/genre/movie/list?api_key=${API_KEY}`);
+	  const genres = genreResponse.data.genres;
+	  const genreNames = genre_ids.map(id => {
+		const genre = genres.find(genre => genre.id === id);
+		return genre.name;
+	  });
+	  const detailsResponse = await axios.get(`https://api.themoviedb.org/3/movie/${id}?api_key=${API_KEY}&append_to_response=videos`);
+	  const details = detailsResponse.data;
+	  const trailerKey = details.videos.results[0].key;
+	  const duration = details.runtime;
+	  const responseObj = {
+		title: title,
+		overview: overview,
+		backdrop_path: `https://image.tmdb.org/t/p/original${backdrop_path}`,
+		poster_path: `https://image.tmdb.org/t/p/original${poster_path}`,
+		trailer: `https://www.youtube.com/watch?v=${trailerKey}`,
+		video: `https://api.themoviedb.org/3/movie/${id}/videos?api_key=${API_KEY}`,
+		release_date: release_date,
+		duration: duration,
+		genre: genreNames.join(', ')
+	  };
+	  const savedMovie = await Movie.create(responseObj);
+	  res.send(savedMovie);
+	} catch (error) {
+	  console.error(error);
+	  res.status(500).send('Error fetching movie data');
+	}
+  });
 
+  
+  //Batch
+  router.post('/batch', async (req, res) => {
+	const { names } = req.body;
+	try {
+	  const results = [];
+	  for (const name of names) {
+		const response = await axios.get(`https://api.themoviedb.org/3/search/movie?api_key=${API_KEY}&query=${name}`);
+		const movie = response.data.results[0];
+		const { title, overview, backdrop_path, poster_path, release_date, genre_ids, id } = movie;
+		const genreResponse = await axios.get(`https://api.themoviedb.org/3/genre/movie/list?api_key=${API_KEY}`);
+		const genres = genreResponse.data.genres;
+		const genreNames = genre_ids.map(id => {
+		  const genre = genres.find(genre => genre.id === id);
+		  return genre.name;
+		});
+		const detailsResponse = await axios.get(`https://api.themoviedb.org/3/movie/${id}?api_key=${API_KEY}&append_to_response=videos`);
+		const details = detailsResponse.data;
+		const trailerKey = details.videos.results[0].key;
+		const duration = details.runtime;
+		const movieObj = {
+		  title: title,
+		  overview: overview,
+		  backdrop_path: `https://image.tmdb.org/t/p/original${backdrop_path}`,
+		  poster_path: `https://image.tmdb.org/t/p/original${poster_path}`,
+		  trailer: `https://www.youtube.com/watch?v=${trailerKey}`,
+		  video: `https://api.themoviedb.org/3/movie/${id}/videos?api_key=${API_KEY}`,
+		  release_date: release_date,
+		  duration: duration,
+		  genre: genreNames.join(', ')
+		};
+		results.push(movieObj);
+	  }
+	  const savedMovies = await Movie.create(results);
+	  res.send(savedMovies);
+	} catch (error) {
+	  console.error(error);
+	  res.status(500).send('Error fetching movie data');
+	}
+  });
+  
 // Update Method
 router.put("/:id",async (req,res)=>{
 

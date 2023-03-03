@@ -7,8 +7,8 @@ const MovieSchema=new mongoose.Schema(
 	poster_path:{type:String},
 	trailer:{type:String},
 	video:{type:String},
-	first_air_date:{type:String},
-	limit:{type:String},
+	release_date:{type:String},
+	duration:{type:String},
 	genre:{type:String},
 	
 	
