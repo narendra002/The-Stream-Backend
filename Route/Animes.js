@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const Anime = require("../Models/Anime.js");
-
+const axios = require('axios');
 // Create Anime
 router.post("/", async (req, res) => {
   const newAnime = new Anime(req.body);
@@ -13,6 +13,50 @@ router.post("/", async (req, res) => {
   }
 });
 
+router.post('/batch', async (req, res) => {
+  const { names } = req.body;
+  try {
+    const results = [];
+    for (const name of names) {
+      const response = await axios.get(`https://kitsu.io/api/edge/anime?filter[text]=${name}`);
+      const anime = response.data.data[0];
+      const { titles: { en_jp: title }, synopsis: overview, posterImage: { original: poster_path }, episodeCount: episodesNumber, averageRating: score, startDate: releaseDate } = anime.attributes;
+       
+      const trailer = `https://www.youtube.com/watch?v=${anime.attributes.youtubeVideoId}`;
+
+      const contentResponse = await axios.get(`https://kitsu.io/api/edge/anime/${anime.id}/episodes`);
+      const content = contentResponse.data.data.map((episode) => {
+        return {
+          title: episode.attributes.titles.en_jp,
+          episode_number: episode.attributes.number,
+          overview: episode.attributes.synopsis,
+          air_date: episode.attributes.airdate
+        }
+      });
+      const animeObj = {
+        title: title,
+        overview: overview,
+        poster_path: poster_path,
+        trailer: trailer,
+        content: content,
+        episodesNumber: episodesNumber,
+        score: score,
+        isSeries: true,
+        backdrop_path: "default_image_path",
+        genre: ["genre1", "genre2"],
+        releaseYear: new Date(releaseDate).getFullYear(),
+        createdDate: Date.now(),
+       
+      };
+      results.push(animeObj);
+    }
+    const savedAnimes = await Anime.create(results);
+    res.send(savedAnimes);
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Error fetching anime data');
+  }
+});
 // Update Anime
 router.put("/:id", async (req, res) => {
   try {

@@ -1,6 +1,9 @@
 const express = require('express');
 const router = express.Router();
 const TvShow = require('../Models/TvShow');
+const axios = require('axios');
+
+const API_KEY = '4008ea8497eda5d3e80f32017f7d35bc';
 
 // Create Method
 router.post('/', async (req, res) => {
@@ -10,6 +13,109 @@ router.post('/', async (req, res) => {
     res.status(201).json(savedTvShow);
   } catch (error) {
     res.status(500).json(error);
+  }
+});
+
+router.get('/:name', async (req, res) => {
+  const name = req.params.name;
+  try {
+    const response = await axios.get(`https://api.themoviedb.org/3/search/tv?api_key=${API_KEY}&query=${name}`);
+    const results = response.data.results;
+    const tvShow = results[0];
+    const { name: title, overview, backdrop_path, poster_path, first_air_date, genre_ids, id, number_of_seasons, number_of_episodes } = tvShow;
+    const genreResponse = await axios.get(`https://api.themoviedb.org/3/genre/tv/list?api_key=${API_KEY}`);
+    const genres = genreResponse.data.genres;
+    const genreNames = genre_ids.map(id => {
+      const genre = genres.find(genre => genre.id === id);
+      return genre.name;
+    });
+    const detailsResponse = await axios.get(`https://api.themoviedb.org/3/tv/${id}?api_key=${API_KEY}`);
+    const details = detailsResponse.data;
+    const trailerKey = details.videos.results[0].key;
+    const seasonNumber = details.seasons.length;
+    const episodesNumber = details.number_of_episodes;
+    const content = details.seasons.map((season) => {
+      return {
+        title: season.name,
+        season_number: season.season_number,
+        episode_number: season.episode_count,
+        episodes: season.episodes.map((episode) => {
+          return {
+            title: episode.name,
+            overview: episode.overview,
+            air_date: episode.air_date,
+            season_number: episode.season_number,
+            episode_number: episode.episode_number
+          };
+        })
+      };
+    });
+    const responseObj = {
+      title: title,
+      overview: overview,
+      backdrop_path: `https://image.tmdb.org/t/p/original${backdrop_path}`,
+      poster_path: `https://image.tmdb.org/t/p/original${poster_path}`,
+      trailer: `https://www.youtube.com/watch?v=${trailerKey}`,
+      content: content,
+      first_air_date: first_air_date,
+      genre: genreNames.join(', '),
+      season: seasonNumber,
+      episodes: episodesNumber,
+      isSeries: true
+    };
+    const savedTvShow = await TvShow.create(responseObj);
+    res.send(savedTvShow);
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Error fetching TV show data');
+  }
+});
+router.post('/batch', async (req, res) => {
+  const { names } = req.body;
+  try {
+    const results = [];
+    for (const name of names) {
+      const response = await axios.get(`https://api.themoviedb.org/3/search/tv?api_key=${API_KEY}&query=${name}`);
+      const tvShow = response.data.results[0];
+      const { name: title, overview, backdrop_path, poster_path, first_air_date, genre_ids, id, number_of_seasons, number_of_episodes } = tvShow;
+      const genreResponse = await axios.get(`https://api.themoviedb.org/3/genre/tv/list?api_key=${API_KEY}`);
+      const genres = genreResponse.data.genres;
+      const genreNames = genre_ids.map(id => {
+        const genre = genres.find(genre => genre.id === id);
+        return genre.name;
+      });
+      const detailsResponse = await axios.get(`https://api.themoviedb.org/3/tv/${id}?api_key=${API_KEY}&append_to_response=videos`);
+      const details = detailsResponse.data;
+      const trailerKey = details.videos.results[0].key;
+      const seasonNumber = details.seasons.length;
+      const episodesNumber = details.number_of_episodes;
+      const content = details.seasons.map((season) => {
+        return {
+          title: season.name,
+          season_number: season.season_number,
+          episode_number: season.episode_count
+        }
+      });
+      const tvShowObj = {
+        title: title,
+        overview: overview,
+        backdrop_path: `https://image.tmdb.org/t/p/original${backdrop_path}`,
+        poster_path: `https://image.tmdb.org/t/p/original${poster_path}`,
+        trailer: `https://www.youtube.com/watch?v=${trailerKey}`,
+        content: content,
+        first_air_date: first_air_date,
+        genre: genreNames.join(', '),
+        season: seasonNumber,
+        episodes: episodesNumber,
+        isSeries: true
+      };
+      results.push(tvShowObj);
+    }
+    const savedTVShows = await TvShow.create(results);
+    res.send(savedTVShows);
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Error fetching TV show data');
   }
 });
 
