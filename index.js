@@ -11,6 +11,7 @@ const tvShowRoute=require('./Route/TvShows');
 const AuthRoute=require('./Route/auth');
 const UserRoute=require('./Route/Users');
 const AnimeRoute=require('./Route/Animes');
+const DownloadVideo=require('./Route/Download');
 app.use(cors())
 mongoose.set('strictQuery', false);
 mongoose.connect(mySecret,								 
@@ -33,6 +34,7 @@ app.use("/tvShow",tvShowRoute);
 app.use("/auth", AuthRoute);
 app.use("/auth", UserRoute);
 app.use("/anime",AnimeRoute);
+app.use("/download",DownloadVideo);
 app.listen(4000, () => {
   console.log('Backend server is running');
 });
