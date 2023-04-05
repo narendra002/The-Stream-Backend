@@ -186,7 +186,15 @@ await Movie.findByIdAndDelete(req.params.id);
 		res.status(500).json(error);
 	}
 });
+router.delete("review/:id",async (req,res)=>{
 
+	try {
+await Review.findByIdAndDelete(req.params.id);
+		res.status(200).json("The movie is Deleted");
+	} catch (error) {
+		res.status(500).json(error);
+	}
+});
 // Get Method
 router.get("/find/:id",async (req,res)=>{
 
