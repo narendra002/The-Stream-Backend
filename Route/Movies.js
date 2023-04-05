@@ -186,15 +186,18 @@ await Movie.findByIdAndDelete(req.params.id);
 		res.status(500).json(error);
 	}
 });
-router.delete("review/",async (req,res)=>{
-
+router.delete("/reviews/:id", async (req, res) => {
 	try {
-await Review.findByIdAndDelete(req.params.id);
-		res.status(200).json("The movie is Deleted");
+	  const deletedReview = await Review.findByIdAndDelete(req.params.id);
+	  if (!deletedReview) {
+		return res.status(404).json({ message: "Review not found" });
+	  }
+	  res.status(200).json({ message: "Review deleted successfully" });
 	} catch (error) {
-		res.status(500).json(error);
+	  res.status(500).json({ message: error.message });
 	}
-});
+  });
+  
 // Get Method
 router.get("/find/:id",async (req,res)=>{
 
