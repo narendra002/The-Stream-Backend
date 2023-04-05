@@ -210,6 +210,16 @@ await Movie.find();
 		res.status(500).json(error);
 	}
 });
+router.get("/review",async (req,res)=>{
+
+	try {
+		const movie=
+await Review.find();
+		res.status(200).json(movie);
+	} catch (error) {
+		res.status(500).json(error);
+	}
+});
 
 // Get Random Method
 router.get("/random",async (req,res)=>{
