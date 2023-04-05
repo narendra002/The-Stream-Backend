@@ -210,7 +210,7 @@ await Movie.find();
 		res.status(500).json(error);
 	}
 });
-router.get("/review",async (req,res)=>{
+router.get("/movies/review",async (req,res)=>{
 
 	try {
 		const movie=
