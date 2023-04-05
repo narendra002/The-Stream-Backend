@@ -9,35 +9,35 @@ const ReviewMovieSchema = new mongoose.Schema(
     },
     overview: {
       type: String,
-      required: true,
+      // required: true,
     },
     backdrop_path: {
       type: String,
-      required: true,
+      // required: true,
     },
     poster_path: {
       type: String,
-      required: true,
+      // required: true,
     },
     trailer: {
       type: String,
-      required: true,
+      // required: true,
     },
     video: {
       type: String,
-      required: true,
+      // required: true,
     },
     release_date: {
       type: String,
-      required: true,
+      // required: true,
     },
     duration: {
       type: String,
-      required: true,
+      // required: true,
     },
     genre: {
       type: String,
-      required: true,
+      // required: true,
     },
   },
   { timestamps: true }
