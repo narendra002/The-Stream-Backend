@@ -4,8 +4,8 @@ const Movie =require("../Models/Movie.js");
 const axios = require('axios');
 const cheerio = require('cheerio');
 const API_KEY = '4008ea8497eda5d3e80f32017f7d35bc';
-
-// Create Method
+const Review =require('../Models/Review');
+	// Create Method
 router.post("/",async (req,res)=>{
 	const newMovie=new Movie (req.body);
 	try {
@@ -16,7 +16,16 @@ router.post("/",async (req,res)=>{
 	}
 	 
 });
-
+router.post("/review",async (req,res)=>{
+	const newMovie=new Review (req.body);
+	try {
+		const savedMovie= await newMovie.save();
+		res.status(201).json(savedMovie);
+	} catch (error) {
+		res.status(500).json(error);
+	}
+	 
+});
 
 
 router.get('/index', async (req, res) => {
