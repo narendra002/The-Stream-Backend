@@ -37,4 +37,5 @@ app.use("/anime",AnimeRoute);
 app.use("/download",DownloadVideo);
 app.listen(4000, () => {
   console.log('Backend server is running');
-});
+}, { functionInvocationTimeout: 3600000 }); // set function invocation timeout to 1 hour (3600 seconds x 1000 milliseconds)
+
