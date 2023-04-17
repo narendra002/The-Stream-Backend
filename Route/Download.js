@@ -6,7 +6,7 @@ const fs = require("fs");
 const MB = 1024 * 1024;
 const zlib = require('zlib');
 
-module.exports = async (req, res) => {
+router.get('/',async (req, res) => {
   try {
     const videoURL = req.query.url;
     res.setHeader('Content-Disposition', 'attachment; filename="video.mp4"');
@@ -23,6 +23,6 @@ module.exports = async (req, res) => {
     console.error(error);
     res.status(500).send('Internal server error');
   }
-};
+});
 
 module.exports = router;
