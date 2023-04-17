@@ -1,18 +1,10 @@
 {
   "version": 2,
-  "builds": [
-    { "src": "index.js", "use": "@vercel/node" }
-  ],
+  "builds": [{ "src": "index.js", "use": "@vercel/node" }],
   "routes": [
     {
       "src": "/(.*)",
       "dest": "/"
     }
-  ],
-  "functions": {
-    "api/*": {
-      "memory": 1024,
-      "timeout": 10
-    }
-  }
+  ]
 }
