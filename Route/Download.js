@@ -26,3 +26,8 @@ router.get('/',async (req, res) => {
 });
 
 module.exports = router;
+module.exports.config = {
+  api: {
+    timeout: 60 // Set function invocation timeout to 60 seconds
+  }
+};
