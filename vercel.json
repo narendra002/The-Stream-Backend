@@ -2,9 +2,13 @@
   "version": 2,
   "builds": [{ "src": "index.js", "use": "@vercel/node" }],
   "routes": [
-    {
-      "src": "/(.*)",
-      "dest": "/"
-    }
+    { "src": "/", "dest": "/" },
+    { "src": "/Watch/:watchId", "dest": "/" },
+    { "src": "/Movies", "dest": "/" },
+    { "src": "/TvShows", "dest": "/" },
+    { "src": "/Anime", "dest": "/" },
+    { "src": "/MovieMain", "dest": "/" },
+    { "src": "/upload", "dest": "/" },
+    { "src": "/(.*)", "dest": "/" }
   ]
 }
